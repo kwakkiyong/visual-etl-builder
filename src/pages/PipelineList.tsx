@@ -53,10 +53,10 @@ export function PipelineList() {
     <div className="p-8">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold mb-2">파이프라인 목록</h1>
+          <h1 className="text-3xl font-bold mb-2 text-gray-900">파이프라인 목록</h1>
           <p className="text-gray-600">파이프라인을 생성, 편집, 실행하세요</p>
         </div>
-        <Link to="/pipelines/new">
+        <Link to="/pipelines/new" className="inline-block">
           <Button>
             <Plus className="w-4 h-4 mr-2" />
             새 파이프라인
@@ -73,7 +73,7 @@ export function PipelineList() {
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
-                  <h3 className="text-lg font-semibold">{pipeline.name}</h3>
+                  <h3 className="text-lg font-semibold text-gray-900">{pipeline.name}</h3>
                   <span
                     className={`px-2 py-1 text-xs rounded ${getStatusColor(
                       pipeline.status
@@ -94,7 +94,7 @@ export function PipelineList() {
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <Link to={`/pipelines/${pipeline.id}/edit`}>
+                <Link to={`/pipelines/${pipeline.id}/edit`} className="inline-block">
                   <Button variant="outline" size="sm">
                     <Edit className="w-4 h-4 mr-2" />
                     편집

@@ -35,7 +35,7 @@ export const BaseNodeSchema = z.object({
     x: z.number(),
     y: z.number(),
   }),
-  data: z.record(z.any()),
+  data: z.record(z.string(), z.any()),
 })
 
 // Source Node Schema
@@ -43,7 +43,7 @@ export const SourceNodeSchema = BaseNodeSchema.extend({
   type: z.literal("source"),
   data: z.object({
     sourceType: SourceNodeTypeSchema,
-    config: z.record(z.any()),
+    config: z.record(z.string(), z.any()),
   }),
 })
 
@@ -52,7 +52,7 @@ export const TransformNodeSchema = BaseNodeSchema.extend({
   type: z.literal("transform"),
   data: z.object({
     transformType: TransformNodeTypeSchema,
-    config: z.record(z.any()),
+    config: z.record(z.string(), z.any()),
   }),
 })
 
@@ -61,7 +61,7 @@ export const LoadNodeSchema = BaseNodeSchema.extend({
   type: z.literal("load"),
   data: z.object({
     loadType: LoadNodeTypeSchema,
-    config: z.record(z.any()),
+    config: z.record(z.string(), z.any()),
   }),
 })
 

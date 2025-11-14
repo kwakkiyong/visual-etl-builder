@@ -31,18 +31,18 @@ export function PipelineEditor() {
   }
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="h-screen flex flex-col bg-gray-50">
       {/* 헤더 */}
       <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link to="/pipelines">
+          <Link to="/pipelines" className="inline-block">
             <Button variant="ghost" size="sm">
               <ArrowLeft className="w-4 h-4 mr-2" />
               뒤로
             </Button>
           </Link>
           <div>
-            <h1 className="text-xl font-semibold">
+            <h1 className="text-xl font-semibold text-gray-900">
               {id ? `파이프라인 편집 #${id}` : "새 파이프라인"}
             </h1>
           </div>

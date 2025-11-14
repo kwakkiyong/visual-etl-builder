@@ -71,7 +71,66 @@ pnpm build
 
 # 빌드 미리보기
 pnpm preview
+
+# 코드 포맷팅
+pnpm format
+
+# 코드 포맷팅 확인
+pnpm format:check
+
+# ESLint 실행
+pnpm lint
+
+# ESLint 자동 수정
+pnpm lint:fix
 ```
+
+## 🛠️ 개발 도구
+
+### Prettier
+코드 포맷팅을 자동으로 적용합니다.
+
+```bash
+# 모든 파일 포맷팅
+pnpm format
+
+# 포맷팅 확인 (CI/CD용)
+pnpm format:check
+```
+
+### ESLint
+코드 품질과 스타일을 검사합니다.
+
+```bash
+# 린트 검사
+pnpm lint
+
+# 자동 수정 가능한 문제 수정
+pnpm lint:fix
+```
+
+### IDE 설정
+
+#### IntelliJ IDEA / WebStorm
+프로젝트에 포함된 `.idea` 설정으로 다음 기능이 자동 활성화됩니다:
+- Prettier 플러그인 설치 시 저장 시 자동 포맷팅
+- ESLint 플러그인 설치 시 저장 시 자동 수정
+- EditorConfig 지원 (`.editorconfig` 파일)
+
+**설정 방법:**
+1. Prettier 플러그인 설치: `Settings` → `Plugins` → `Prettier` 검색 후 설치
+2. ESLint 플러그인 설치: `Settings` → `Plugins` → `ESLint` 검색 후 설치
+3. Prettier 설정: `Settings` → `Languages & Frameworks` → `JavaScript` → `Prettier`
+   - Prettier package: `$PROJECT_DIR$/node_modules/prettier`
+   - Run on save: 체크
+4. ESLint 설정: `Settings` → `Languages & Frameworks` → `JavaScript` → `Code Quality Tools` → `ESLint`
+   - Automatic ESLint configuration: 체크
+
+#### VS Code
+프로젝트에 포함된 `.vscode/settings.json`으로 다음 기능이 자동 활성화됩니다:
+- 저장 시 자동 포맷팅
+- 저장 시 ESLint 자동 수정
+- Prettier를 기본 포맷터로 사용
 
 ## ✨ 주요 기능
 

@@ -81,10 +81,10 @@ export function RunHistory() {
     <div className="p-8">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold mb-2">실행 이력</h1>
+          <h1 className="text-3xl font-bold mb-2 text-gray-900">실행 이력</h1>
           <p className="text-gray-600">파이프라인 실행 로그를 확인하세요</p>
         </div>
-        <Link to="/">
+        <Link to="/" className="inline-block">
           <Button variant="outline">
             <ArrowLeft className="w-4 h-4 mr-2" />
             대시보드로
@@ -127,7 +127,7 @@ export function RunHistory() {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium">{log.pipelineName}</div>
+                    <div className="text-sm font-medium text-gray-900">{log.pipelineName}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">{log.startedAt}</div>
