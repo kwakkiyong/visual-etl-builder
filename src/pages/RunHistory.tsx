@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/Button"
 import { ArrowLeft, Play, CheckCircle, XCircle, Clock } from "lucide-react"
 import { Link } from "react-router-dom"
 

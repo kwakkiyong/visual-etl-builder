@@ -69,6 +69,11 @@ export function NodePalette() {
     addNode(newNode)
   }
 
+  const handleDragStart = (event: React.DragEvent, template: typeof nodeTemplates[0]) => {
+    event.dataTransfer.setData("application/reactflow", JSON.stringify(template))
+    event.dataTransfer.effectAllowed = "move"
+  }
+
   return (
     <div className="w-64 bg-white border-r border-gray-200 p-4 overflow-y-auto">
       <h2 className="text-lg font-semibold mb-4">노드 팔레트</h2>
@@ -77,40 +82,46 @@ export function NodePalette() {
         {nodeTemplates
           .filter((n) => n.type === "source")
           .map((template) => (
-            <button
+            <div
               key={template.label}
+              draggable
+              onDragStart={(e) => handleDragStart(e, template)}
               onClick={() => handleAddNode(template)}
-              className="w-full flex items-center gap-2 p-3 text-left border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+              className="w-full flex items-center gap-2 p-3 text-left border border-gray-200 rounded-md hover:bg-gray-50 transition-colors cursor-grab active:cursor-grabbing"
             >
               <template.icon className="w-5 h-5" />
               <span>{template.label}</span>
-            </button>
+            </div>
           ))}
         <div className="text-sm font-medium text-gray-500 mb-2 mt-4">Transform</div>
         {nodeTemplates
           .filter((n) => n.type === "transform")
           .map((template) => (
-            <button
+            <div
               key={template.label}
+              draggable
+              onDragStart={(e) => handleDragStart(e, template)}
               onClick={() => handleAddNode(template)}
-              className="w-full flex items-center gap-2 p-3 text-left border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+              className="w-full flex items-center gap-2 p-3 text-left border border-gray-200 rounded-md hover:bg-gray-50 transition-colors cursor-grab active:cursor-grabbing"
             >
               <template.icon className="w-5 h-5" />
               <span>{template.label}</span>
-            </button>
+            </div>
           ))}
         <div className="text-sm font-medium text-gray-500 mb-2 mt-4">Load</div>
         {nodeTemplates
           .filter((n) => n.type === "load")
           .map((template) => (
-            <button
+            <div
               key={template.label}
+              draggable
+              onDragStart={(e) => handleDragStart(e, template)}
               onClick={() => handleAddNode(template)}
-              className="w-full flex items-center gap-2 p-3 text-left border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+              className="w-full flex items-center gap-2 p-3 text-left border border-gray-200 rounded-md hover:bg-gray-50 transition-colors cursor-grab active:cursor-grabbing"
             >
               <template.icon className="w-5 h-5" />
               <span>{template.label}</span>
-            </button>
+            </div>
           ))}
       </div>
     </div>

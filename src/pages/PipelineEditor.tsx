@@ -1,23 +1,31 @@
 import { NodePalette } from "@/components/NodePalette"
 import { PipelineCanvas } from "@/features/pipeline-editor/PipelineCanvas"
 import { NodeConfigPanel } from "@/components/NodeConfigPanel"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/Button"
 import { Save, Play, ArrowLeft } from "lucide-react"
 import { Link, useParams } from "react-router-dom"
 import { usePipelineStore } from "@/features/pipeline-editor/usePipelineStore"
 
 export function PipelineEditor() {
   const { id } = useParams()
-  const { nodes, edges, clearPipeline } = usePipelineStore()
+  const { nodes, edges } = usePipelineStore()
 
   const handleSave = () => {
     // 파이프라인 저장 로직
+    if (nodes.length === 0) {
+      alert("저장할 파이프라인이 없습니다.")
+      return
+    }
     console.log("Saving pipeline:", { nodes, edges })
     alert("파이프라인이 저장되었습니다.")
   }
 
   const handleRun = () => {
     // 파이프라인 실행 로직
+    if (nodes.length === 0) {
+      alert("실행할 파이프라인이 없습니다.")
+      return
+    }
     console.log("Running pipeline:", { nodes, edges })
     alert("파이프라인 실행을 시작합니다.")
   }

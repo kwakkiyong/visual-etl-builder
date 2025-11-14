@@ -1,6 +1,6 @@
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/Sheet"
+import { Input } from "@/components/ui/Input"
+import { Button } from "@/components/ui/Button"
 import { usePipelineStore } from "@/features/pipeline-editor/usePipelineStore"
 import { BaseNode } from "@/lib/schema"
 

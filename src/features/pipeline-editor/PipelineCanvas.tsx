@@ -1,20 +1,24 @@
-import { useCallback, useEffect } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import ReactFlow, {
   Background,
   Controls,
   MiniMap,
   Node,
-  Edge,
   Connection,
   addEdge,
   useNodesState,
   useEdgesState,
   NodeTypes,
+  ReactFlowInstance,
+  NodeChange,
+  EdgeChange,
+  applyNodeChanges,
+  applyEdgeChanges,
 } from "reactflow"
 import "reactflow/dist/style.css"
 import { CustomNode } from "@/components/Node"
 import { usePipelineStore } from "./usePipelineStore"
-import { BaseNode } from "@/lib/schema"
+import { BaseNode, Edge } from "@/lib/schema"
 
 const nodeTypes: NodeTypes = {
   custom: CustomNode,
@@ -24,78 +28,115 @@ export function PipelineCanvas() {
   const {
     nodes: storeNodes,
     edges: storeEdges,
-    setNodes,
-    setEdges,
+    setNodes: setStoreNodes,
+    setEdges: setStoreEdges,
     setSelectedNode,
+    addNode,
   } = usePipelineStore()
 
-  const [nodes, setNodesState, onNodesChange] = useNodesState(storeNodes)
-  const [edges, setEdgesState, onEdgesChange] = useEdgesState(storeEdges)
+  const [nodes, setNodes] = useNodesState([])
+  const [edges, setEdges] = useEdgesState([])
+  const reactFlowWrapper = useRef<HTMLDivElement>(null)
+  const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null)
 
-  // Store와 동기화
+  // Store의 노드 ID 목록을 메모이제이션
+  const storeNodeIds = useMemo(() => 
+    storeNodes.map(n => n.id).join(','), 
+    [storeNodes]
+  )
+  
+  const storeEdgeIds = useMemo(() => 
+    storeEdges.map(e => e.id).join(','), 
+    [storeEdges]
+  )
+
+  // Store에서 React Flow로 동기화
   useEffect(() => {
-    setNodesState(storeNodes.map((n) => ({
+    const reactFlowNodes = storeNodes.map((n) => ({
       id: n.id,
-      type: "custom",
+      type: "custom" as const,
       position: n.position,
       data: n,
-    })))
-  }, [storeNodes, setNodesState])
+    }))
+    
+    // Store의 노드 ID와 현재 React Flow 노드 ID를 비교
+    setNodes((currentNodes) => {
+      const currentIds = new Set(currentNodes.map(n => n.id))
+      const newIds = new Set(storeNodes.map(n => n.id))
+      
+      // 노드가 추가/제거되었거나 개수가 다른 경우 업데이트
+      if (newIds.size !== currentIds.size ||
+          ![...newIds].every(id => currentIds.has(id))) {
+        return reactFlowNodes
+      }
+      return currentNodes
+    })
+  }, [storeNodeIds, storeNodes, setNodes])
 
   useEffect(() => {
-    setEdgesState(storeEdges)
-  }, [storeEdges, setEdgesState])
+    setEdges((currentEdges) => {
+      const currentIds = new Set(currentEdges.map(e => e.id))
+      const newIds = new Set(storeEdges.map(e => e.id))
+      
+      if (newIds.size !== currentIds.size ||
+          ![...newIds].every(id => currentIds.has(id))) {
+        return storeEdges
+      }
+      return currentEdges
+    })
+  }, [storeEdgeIds, storeEdges, setEdges])
 
+  // React Flow에서 Store로 동기화
   const onNodesChangeHandler = useCallback(
-    (changes: any) => {
-      onNodesChange(changes)
-      const updatedNodes = nodes.map((n) => {
-        const change = changes.find((c: any) => c.id === n.id)
-        if (change?.type === "position" && change.position) {
-          return {
-            ...n,
-            position: change.position,
-          }
-        }
-        return n
-      })
-      setNodes(
-        updatedNodes.map((n) => ({
-          id: n.id,
-          type: n.data.type,
-          position: n.position,
-          data: n.data,
-        }))
-      )
+    (changes: NodeChange[]) => {
+      const updatedNodes = applyNodeChanges(changes, nodes)
+      setNodes(updatedNodes)
+      
+      // Store에 동기화
+      setStoreNodes(updatedNodes.map((n) => ({
+        id: n.id,
+        type: (n.data as BaseNode).type,
+        position: n.position,
+        data: (n.data as BaseNode).data,
+      })))
     },
-    [nodes, onNodesChange, setNodes]
+    [nodes, setNodes, setStoreNodes]
   )
 
   const onEdgesChangeHandler = useCallback(
-    (changes: any) => {
-      onEdgesChange(changes)
-      const updatedEdges = edges.filter(
-        (e) => !changes.some((c: any) => c.id === e.id && c.type === "remove")
-      )
+    (changes: EdgeChange[]) => {
+      const updatedEdges = applyEdgeChanges(changes, edges)
       setEdges(updatedEdges)
+
+      // Store에 동기화
+      setStoreEdges(updatedEdges.map((e): Edge => ({
+        id: e.id,
+        source: e.source,
+        target: e.target,
+        sourceHandle: e.sourceHandle ?? undefined,
+        targetHandle: e.targetHandle ?? undefined,
+      })))
     },
-    [edges, onEdgesChange, setEdges]
+    [edges, setEdges, setStoreEdges]
   )
 
   const onConnect = useCallback(
     (params: Connection) => {
       if (!params.source || !params.target) return
-      const newEdge = {
-        id: `edge-${params.source}-${params.target}`,
-        source: params.source,
-        target: params.target,
-        sourceHandle: params.sourceHandle,
-        targetHandle: params.targetHandle,
-      }
-      setEdges([...edges, newEdge])
-      setEdgesState((eds) => addEdge(params, eds))
+      
+      setEdges((eds) => {
+        const updated = addEdge(params, eds)
+        setStoreEdges(updated.map((e): Edge => ({
+          id: e.id,
+          source: e.source,
+          target: e.target,
+          sourceHandle: e.sourceHandle ?? undefined,
+          targetHandle: e.targetHandle ?? undefined,
+        })))
+        return updated
+      })
     },
-    [edges, setEdges, setEdgesState]
+    [setEdges, setStoreEdges]
   )
 
   const onNodeClick = useCallback(
@@ -105,8 +146,49 @@ export function PipelineCanvas() {
     [setSelectedNode]
   )
 
+  const onDragOver = useCallback((event: React.DragEvent) => {
+    event.preventDefault()
+    event.dataTransfer.dropEffect = "move"
+  }, [])
+
+  const onDrop = useCallback(
+    (event: React.DragEvent) => {
+      event.preventDefault()
+
+      const templateStr = event.dataTransfer.getData("application/reactflow")
+      if (!templateStr || !reactFlowInstance) {
+        return
+      }
+
+      let template
+      try {
+        template = JSON.parse(templateStr)
+      } catch {
+        return
+      }
+
+      const reactFlowBounds = reactFlowWrapper.current?.getBoundingClientRect()
+      if (!reactFlowBounds) return
+
+      const position = reactFlowInstance.screenToFlowPosition({
+        x: event.clientX - reactFlowBounds.left,
+        y: event.clientY - reactFlowBounds.top,
+      })
+
+      const newNode: BaseNode = {
+        id: `${template.type}-${Date.now()}`,
+        type: template.type,
+        position,
+        data: template.data,
+      }
+
+      addNode(newNode)
+    },
+    [reactFlowInstance, addNode]
+  )
+
   return (
-    <div className="flex-1 h-full">
+    <div className="flex-1 h-full" ref={reactFlowWrapper}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -114,6 +196,9 @@ export function PipelineCanvas() {
         onEdgesChange={onEdgesChangeHandler}
         onConnect={onConnect}
         onNodeClick={onNodeClick}
+        onInit={setReactFlowInstance}
+        onDrop={onDrop}
+        onDragOver={onDragOver}
         nodeTypes={nodeTypes}
         fitView
       >
@@ -124,4 +209,3 @@ export function PipelineCanvas() {
     </div>
   )
 }
-
