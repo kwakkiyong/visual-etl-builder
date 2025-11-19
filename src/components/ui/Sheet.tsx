@@ -36,7 +36,7 @@ export function Sheet({ open, onOpenChange, children, side = "right" }: SheetPro
 
 export function SheetContent({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={cn("p-6 h-full overflow-y-auto", className)}>
+    <div className={cn("p-6 h-full overflow-y-auto bg-white", className)}>
       {children}
     </div>
   )
